@@ -1,4 +1,4 @@
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
 // create our User model
@@ -69,4 +69,4 @@ User.init(
 );
 
 // export newly created model so it can be used in other parts of the app
-model.exports = User;
+module.exports = User;
