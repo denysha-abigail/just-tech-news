@@ -10,6 +10,7 @@ class User extends Model {}
 // the first object: defines the columns and data types for those columns
 // the second object: accepts and configures certain options for the table
 User.init(
+    // each column gets its own type definition (where we use the imported Sequelize DataTypes object to define what type of data it will be); we also applied other options found in SQL, such as allowNULL (NOT NULL in MySQL) and autoIncrement (AUTO INCREMENT in MySQL)
     {
         // define an id column
         id: {
@@ -18,6 +19,7 @@ User.init(
             // this is the equivalent of SQL's `NOT NULL` option
             allowNull: false,
             // instruct that this is the Primary Key
+            // if we didn't define the model to have a primaryKey option set up anywhere, Sequelize would create one for use, but it's best we explicitly define ALL of the data
             primaryKey: true,
             // turn on auto increment
             autoIncrement: true
@@ -34,7 +36,9 @@ User.init(
             // there cannot be any duplicate email values in this table
             unique: true,
             // if allowNull is set to false, we can run our data through validators before creating the table data 
+            // Sequelize's built-in validators
             validate: {
+                // ensures any email data follows the pattern of an email address (i.e., <string>@<string>.<string>)
                 isEmail: true
             }
         },
