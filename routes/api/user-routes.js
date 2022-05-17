@@ -62,6 +62,31 @@ router.post('/', (req, res) => {
         });
 });
 
+// this route will be found at http://localhost:3001/api/users/login
+// POST is the standard for the loging that's in process
+// GET carries the request parameter appended in the URL string; POST, on the other hand, carries the request parameter in req.body (which makes it a more secure way of transferring data from the client to the server)
+router.post('/login', (req, res) => {
+    // expectd {email: 'lernantino@gmail.com', password: 'password1234'}
+    // query the User table using the findOne() method for the email entered by the user and assigned it to req.body.email
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(dbUserData => {
+        if(!dbUserData) {
+            // if user with that email not found, a message is sent back as a response to the client
+            res.status(400).json({ message: 'No user with that email address! '});
+            return;
+        }
+        // if email was found in the database, the next step would be to verify the user's identity by matching the password from the user and the hashed password in the database
+
+        // res.json({ user: dbUserData });
+
+        // verify user
+
+    });
+});
+
 // PUT /api/users/1
 // to update existing data
 router.put('/:id', (req, res) => {
