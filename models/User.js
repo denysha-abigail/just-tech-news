@@ -4,7 +4,13 @@ const bcrypt = require('bcrypt');
 
 // create our User model
 // this Model class is what we create our own models from using the extends keyword so User inherits all of the below functionality
-class User extends Model {}
+class User extends Model {
+    // set up method to run on instance data (per user) to check password
+    checkPassword(loginPw) {
+        // using the keyword this, we can access the user's properties (including the password, which was stored as a hashed string)
+        return bcrypt.compareSync(loginPw, this.password);
+    }
+}
 
 // define table columns and configuration
 // one the User class is created, we use the .init() method to initialize the model's data and configuration, passing in two objects as arguments

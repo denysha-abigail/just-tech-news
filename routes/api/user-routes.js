@@ -1,3 +1,4 @@
+// objects generated from classes are instances of the class
 const router = require('express').Router();
 const { User } = require('../../models');
 
@@ -68,10 +69,12 @@ router.post('/', (req, res) => {
 router.post('/login', (req, res) => {
     // expectd {email: 'lernantino@gmail.com', password: 'password1234'}
     // query the User table using the findOne() method for the email entered by the user and assigned it to req.body.email
+    // .findOne() sequelize method looks for a user with the specified email
     User.findOne({
         where: {
             email: req.body.email
         }
+    // the result of the query is passed as dbUserData to the .then() part of the .findOne() method; 
     }).then(dbUserData => {
         if(!dbUserData) {
             // if user with that email not found, a message is sent back as a response to the client
@@ -79,11 +82,19 @@ router.post('/login', (req, res) => {
             return;
         }
         // if email was found in the database, the next step would be to verify the user's identity by matching the password from the user and the hashed password in the database
-
-        // res.json({ user: dbUserData });
-
         // verify user
-
+        // if query result is succcessful, we can call .checkPassword(), which will be on the dbUserData object; we'll need to pass the plaintext password (stored in req.body.password) into .checkPassword() as the argument
+        // the .compareSync() method (which is inside .checkPassword() method) can then confirm or deny that the supplied password matches the hashed password stored on the object; 
+        // .checkPassword() will then return true on success or false on failure; we'll store this boolean value to the validPassword variable
+        // note that the instance method was called on the user retrieved from the database, dbUserData (because it returns a boolean, we can use it in a conditional statement to verify whether the user has been verified or not)
+        const validPassword = dbUserData.checkPassword(req.body.password);
+        if (!validPassword) {
+            // if match returns false value, an error message is sent back to the client; the return exits out of the function immediately
+            res.status(400).json({ message: 'Incorrect password!' });
+            return;
+        }
+        // if there is a match, the conditional statement block is ignored, and a response with the data and message below are sent instead
+        res.json({ user: dbUserData, message: 'You are now logged in!' });
     });
 });
 
