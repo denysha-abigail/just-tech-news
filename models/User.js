@@ -54,8 +54,18 @@ User.init(
         }
     },
     {
-        // TABLE CONFIGURATION OPTIONS GO HERE (https://sequelize.org/v5/manual/models-definition.html#configuration))
-
+        hooks: {
+            // set up beforeCreate lifecycle "hook" functionality
+            // hooks are functions that are called before or after calls in sequelize
+            // here we use the beforeCreate() hook to execute the bcrypt hash function on the plaintext password; in the bcrypt hash function, we pass in the newUserData object that contains the plaintext password in the password property; we also pass in a saltRound value of 10
+            // saltRounds -> known as the cost factor and controls how many rounds of hashing are done by the bcrypt algorithm
+            async beforeCreate(newUserData) {
+                // async/await; async is used as a prefix to the function that contains the asynchronous function while await can be used to prefix the async function, which will then assign the value from the response to the newUserData's password property; the newUserData is the returned to the application with the hashed password
+                newUserData.password = await bcrypt.hash(newUserData.password, 10);
+                    // the return then exits out of the function and returns the hashed password in the newUserData function
+                    return newUserData;
+            }
+        },
         // pass in our imported sequelize connection (the direct connection to our database)
         sequelize,
         // don't automatically create createdAt/updatedAt timestamp fields
