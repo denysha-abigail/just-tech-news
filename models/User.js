@@ -64,6 +64,11 @@ User.init(
                 newUserData.password = await bcrypt.hash(newUserData.password, 10);
                     // the return then exits out of the function and returns the hashed password in the newUserData function
                     return newUserData;
+            },
+            // set up beforeUpdate lifecycle "hook" functionality
+            async beforeUpdate(updatedUserData) {
+                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                return updatedUserData;
             }
         },
         // pass in our imported sequelize connection (the direct connection to our database)

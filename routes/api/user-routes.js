@@ -71,6 +71,8 @@ router.put('/:id', (req, res) => {
     // this .update() method combines the parameters for creating data and looking up data; we pass in req.body to provide the new data we want to use in the update and req.params.id to indicated where exactly we want that new data to be used
     // similar to SQL query --> UPDATE users SET username = "Lernantino", email = "lernantino@gmail.com", password = "newPassword1234" WHERE id = 1;
     User.update(req.body, {
+        // for hook to be effective, we must add this option to the query call
+        individualHooks: true,
         where: {
             id: req.params.id
         }
