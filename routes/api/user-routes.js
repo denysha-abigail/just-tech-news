@@ -11,7 +11,9 @@ router.get('/', (req, res) => {
     // access our User model and run .findAll () method
     // .findAll() method lets us query all of the users from the user table in the database which is equivalent to SQL query statement --> SELECT * FROM users;
     // because sequelize is javascript promise-based library, meaning we can use .then() with all of the model methods
-    User.findAll()
+    User.findAll({
+        attributes: { exclude: ['password'] }
+    })
         .then(dbUserData => res.json(dbUserData))
         .catch(err => {
             console.log(err);
@@ -23,6 +25,7 @@ router.get('/', (req, res) => {
 // only returns one used based on its req.params.id value
 router.get('/:id', (req, res) => {
     User.findOne({
+        attributes: { exclude: ['password'] },
         // using where option to indicate we want to find a user where its id value equals whatever req.params.id is, similar to SQL query --> SELECT * FROM users Where id = 1
         where: {
             id: req.params.id
