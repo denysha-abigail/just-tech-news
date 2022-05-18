@@ -83,7 +83,7 @@ router.post('/login', (req, res) => {
         }
         // if email was found in the database, the next step would be to verify the user's identity by matching the password from the user and the hashed password in the database
         // verify user
-        // if query result is succcessful, we can call .checkPassword(), which will be on the dbUserData object; we'll need to pass the plaintext password (stored in req.body.password) into .checkPassword() as the argument
+        // if query result is succcessful, we can call .checkPassword(), which will be on the dbUserData object; we'll need to pass the plaintext (both cleartext and plaintext refer to unencrypted text) password (stored in req.body.password) into .checkPassword() as the argument
         // the .compareSync() method (which is inside .checkPassword() method) can then confirm or deny that the supplied password matches the hashed password stored on the object; 
         // .checkPassword() will then return true on success or false on failure; we'll store this boolean value to the validPassword variable
         // note that the instance method was called on the user retrieved from the database, dbUserData (because it returns a boolean, we can use it in a conditional statement to verify whether the user has been verified or not)
