@@ -68,4 +68,31 @@ router.post('/', (req, res) => {
     });
 });
 
+// when testing in insomnia, the response may be just a 1 but it is SQL's way of verifying that the number of rows changed in the last query
+router.put('/:id', (req, res) => {
+    Post.update(
+        // use request parameter to find the post, then used the req.body.title value to replace the title of the post
+        {
+            title: req.body.title
+        },
+        {
+            where: {
+                id: req.params.id
+            }
+        }
+    )
+    // in the response, we sent back data that has been modified and stored in the database
+    .then(dbPostData => {
+        if (!dbPostData) {
+            res.status(404).json({ message: 'No post found with this id' });
+            return;
+        }
+        res.json(dbPostData);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    })
+})
+
 module.exports = router;
