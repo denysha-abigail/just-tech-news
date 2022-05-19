@@ -1,6 +1,6 @@
 // objects generated from classes are instances of the class
 const router = require('express').Router();
-const { User } = require('../../models');
+const { User, Post, Vote } = require('../../models');
 
 // naming conventions (i.e /api/users, /api/posts, /api/comments), along with the use of HTTP methods follow a famous API architectural pattern called REST, or Representational State Transfer; APIs built following this pattern are what's known as RESTful APIs
 // some guidelines => name endpoints in a way that describes the data you're interfacing with, usee HTTP methods like get, post, put, and delete to describe the action you're performing to interface with that endpoint (GET /api/users - you should expect to receive user data), and use the propert HTTP status codes like 400, 404, and 500 to indicate errors in a request
@@ -30,7 +30,22 @@ router.get('/:id', (req, res) => {
         // using where option to indicate we want to find a user where its id value equals whatever req.params.id is, similar to SQL query --> SELECT * FROM users Where id = 1
         where: {
             id: req.params.id
-        }
+        },
+        // allows us to see which posts a user has created and which posts a user has voted on (voted_posts - to know which data is which)
+        include: [
+            {
+                model: Post,
+                attributes: ['id', 'title', 'post_url', 'created_at']
+            },
+            // when we query a single user, we'll receive the title information of every post they've ever voted on
+            // to do this however, we have to include the Post model but this time contextualize it by going through the Vote table
+            {
+                model: Post,
+                attributes: ['title'],
+                through: Vote,
+                as: 'voted_posts'
+            }
+        ]
     })
         .then(dbUserData => {
             if (!dbUserData) {
