@@ -37,6 +37,14 @@ router.get('/:id', (req, res) => {
                 model: Post,
                 attributes: ['id', 'title', 'post_url', 'created_at']
             },
+            {
+                model: Comment,
+                attributes: ['id', 'comment_text', 'created_at'],
+                include: {
+                    model: Post,
+                    attributes: ['title']
+                }
+            },
             // when we query a single user, we'll receive the title information of every post they've ever voted on
             // to do this however, we have to include the Post model but this time contextualize it by going through the Vote table
             {
