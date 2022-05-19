@@ -8,6 +8,8 @@ router.get('/', (req, res) => {
     // first, we'll account for the other columns that we'll retrieve in this query 
     Post.findAll({
         attributes: ['id', 'post_url', 'title', 'created_at'],
+        // the order property is assigned a nested array that orders by the created_at column in descending order to ensure the lated posted articles appear first
+        order: [['created_at', 'DESC']],
         // and then account for the JOIN to the User table
         // notice that the include property is expressed as an array of objects; to define this object, we need a reference to the model and attributes
         include: [
@@ -54,6 +56,7 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
     // we are using req.body to populate the columns in the post table
+    // INSERT INTO post (title, post_url, user_id, created_at, updated_at) VALUES ("Taskmaster goes public!", "https://taskmaster/press", 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     // similar to the SQL query --> INSERT INTO
     // We did not assign the created_at or updated_at fields in req.body; sequelize allows the values for these fields to be assigned automatically with CURRENT_TIMESTAMP values, which allows us to NOT include it on the request
     Post.create({
@@ -92,7 +95,26 @@ router.put('/:id', (req, res) => {
     .catch(err => {
         console.log(err);
         res.status(500).json(err);
+    });
+});
+
+router.delete('/:id', (req, res) => {
+    Post.destroy({
+        where: {
+            id: req.params.id
+        }
     })
-})
+    .then(dbPostData => {
+        if (!dbPostData) {
+            res.status(404).json({ message: 'No post found with this id' });
+            return;
+        }
+        res.json(dbPostData);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    });
+});
 
 module.exports = router;
