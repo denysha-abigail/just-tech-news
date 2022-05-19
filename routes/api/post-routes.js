@@ -8,7 +8,13 @@ router.get('/', (req, res) => {
     console.log('======================');
     // first, we'll account for the other columns that we'll retrieve in this query 
     Post.findAll({
-        attributes: ['id', 'post_url', 'title', 'created_at'],
+        attributes: [
+            'id', 
+            'post_url', 
+            'title', 
+            'created_at',
+            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
+        ],
         // the order property is assigned a nested array that orders by the created_at column in descending order to ensure the lated posted articles appear first
         order: [['created_at', 'DESC']],
         // and then account for the JOIN to the User table
@@ -33,7 +39,13 @@ router.get('/:id', (req, res) => {
         where: {
             id: req.params.id
         },
-        attributes: ['id', 'post_url', 'title', 'created_at'],
+        attributes: [
+            'id', 
+            'post_url', 
+            'title', 
+            'created_at',
+            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
+        ],
         include: [
             {
                 model: User,
