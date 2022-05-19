@@ -52,4 +52,20 @@ router.get('/:id', (req, res) => {
     });
 });
 
+router.post('/', (req, res) => {
+    // we are using req.body to populate the columns in the post table
+    // similar to the SQL query --> INSERT INTO
+    // We did not assign the created_at or updated_at fields in req.body; sequelize allows the values for these fields to be assigned automatically with CURRENT_TIMESTAMP values, which allows us to NOT include it on the request
+    Post.create({
+        title: req.body.title,
+        post_url: req.body.post_url,
+        user_id: req.body.user_id
+    })
+    .then(dbPostData => res.json(dbPostData))
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    });
+});
+
 module.exports = router;
