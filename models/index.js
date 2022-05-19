@@ -5,7 +5,9 @@ const Post = require('./Post');
 
 // create associations
 // a user can make many posts
+// one-to-many relationship
 User.hasMany(Post, {
+    // associated key between two tables
     foreignKey: 'user_id'
 });
 
