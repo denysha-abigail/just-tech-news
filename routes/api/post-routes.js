@@ -1,6 +1,7 @@
 const router = require('express').Router();
 // we include the User model for the post-routes because we want to retrieve not only information about each post, but also the user that posted it; with the foreign key user_id, we can form a JOIN
-const { Post, User } = require('../../models');
+const { Post, User, Vote } = require('../../models');
+const sequelize = require('../../config/connection');
 
 // get all posts
 router.get('/', (req, res) => {
@@ -68,6 +69,41 @@ router.post('/', (req, res) => {
     .catch(err => {
         console.log(err);
         res.status(500).json(err);
+    });
+});
+
+// PUT /api/posts/upvote
+// goes before the /:id PUT route; otherwise Express.js will think the word 'upvote' is a valid parameter for /:id
+router.put('/upvote', (req, res) => {
+    // to create a vote, we need to pass in both the user's id and the post's id with req.body
+    Vote.create({
+        user_id: req.body.user_id,
+        post_id: req.body.post_id
+    }).then(() => {
+        // then find the post we just voted on
+        // queries the post we voted on after the vote was created
+        return Post.findOne({
+            where: {
+                id: req.body.post_id
+            },
+            attributes: [
+                'id',
+                'post_url',
+                'title',
+                'created_at',
+                // use raw MySQL aggregate function query to get a count of how many votes the post has
+                [
+                    // .literal() allows us to run regular SQL queries from within the sequelize method-based queries
+                    sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'),
+                    'vote_count'
+                ]
+            ]
+        })
+        .then(dbPostData => res.json(dbPostData))
+        .catch(err => {
+          console.log(err);
+          res.status(400).json(err);
+        });
     });
 });
 

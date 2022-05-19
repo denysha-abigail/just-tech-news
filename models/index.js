@@ -53,4 +53,4 @@ Post.belongsToMany(User, {
     foreignKey: 'post_id'
 });
 
-module.exports = { User, Post };
+module.exports = { User, Post, Vote };
