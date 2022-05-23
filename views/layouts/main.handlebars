@@ -1,0 +1,31 @@
+{{!-- Your file/folder structure MUST be set up this way for Handlebars.js to work correctly. You will always have a main layout located at (and named) views/layouts/main.handlebars. All other template files will go directly in the views folder (views/welcome.handlebars). --}}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Just Tech News</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>
+        <a href="/">Just Tech News</a>
+      </h1>
+    </header>
+    <main>
+    {{!-- handlebars.js syntax for data that will be plugged in later; in this case, the data will be another, smaller template, like the contents of the homepage --}}
+      {{{ body }}}
+    </main>
+    <footer>
+      Thanks for visiting!
+    </footer>
+  </div>
+
+</body>
+
+</html>

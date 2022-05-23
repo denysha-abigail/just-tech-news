@@ -5,6 +5,12 @@ const routes = require('./routes');
 const sequelize = require('./config/connection');
 // allows stylesheet to be made available to the client
 const path = require('path');
+// sets up handlebars.js as app's template engine of choice
+const exphbs = require('express-handlebars');
+const hbs = exphbs.create({});
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
