@@ -1,6 +1,6 @@
 const express = require('express');
 // the router instance in routes/index.js collected everything and packaged them up for server.js to use
-const routes = require('./routes');
+const routes = require('./controllers');
 // importing connection to sequelize
 const sequelize = require('./config/connection');
 // allows stylesheet to be made available to the client
