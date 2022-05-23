@@ -9,9 +9,6 @@ const path = require('path');
 const exphbs = require('express-handlebars');
 const hbs = exphbs.create({});
 
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -22,6 +19,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // turn on routes
 app.use(routes);
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
 
 // turn on connection to db and server
 // established connection; the .sync() part means that this is sequelize taking the models and connecting them to associated database tables (if it doesn't find a table, it'll create it for you)
