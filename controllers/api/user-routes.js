@@ -137,6 +137,19 @@ router.post('/login', (req, res) => {
     });
 });
 
+// gives user ability to log out; this entails destroying the session variables and resetting the cookie
+router.post('/logout', (req, res) => {
+    if (req.session.loggedIn) {
+        // we can use the destroy() method to clear the session
+        req.session.destroy(() => {
+            // status code 204 is sent back to the user after the session has successfully been destroyed
+            res.status(204).end();
+        });
+    } else {
+        res.status(404).end();
+    }
+});
+
 // PUT /api/users/1
 // to update existing data
 router.put('/:id', (req, res) => {
