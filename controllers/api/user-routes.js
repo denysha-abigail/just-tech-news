@@ -79,11 +79,18 @@ router.post('/', (req, res) => {
         email: req.body.email,
         password: req.body.password
     })
-        .then(dbUserData => res.json(dbUserData))
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        });
+        // this gives our server easy access to the user's user_id, username, and a Boolean describing whether or not the user is logged in
+        .then(dbUserData => {
+            // we want to make sure the session is created before we send the response back so we're wrapping the variables in a callback
+            // the req.session.save() method will initiate the creation of the session and then run the callback function once complete
+            req.session.save(() => {
+                req.session.user_id = dbUserData.id;
+                req.session.username = dbUserData.username;
+                req.session.loggedIn = true;
+
+                res.json(dbUserData);
+            });
+        })
 });
 
 // this route will be found at http://localhost:3001/api/users/login
@@ -97,11 +104,11 @@ router.post('/login', (req, res) => {
         where: {
             email: req.body.email
         }
-    // the result of the query is passed as dbUserData to the .then() part of the .findOne() method; 
+        // the result of the query is passed as dbUserData to the .then() part of the .findOne() method; 
     }).then(dbUserData => {
-        if(!dbUserData) {
+        if (!dbUserData) {
             // if user with that email not found, a message is sent back as a response to the client
-            res.status(400).json({ message: 'No user with that email address! '});
+            res.status(400).json({ message: 'No user with that email address! ' });
             return;
         }
         // if email was found in the database, the next step would be to verify the user's identity by matching the password from the user and the hashed password in the database
@@ -111,13 +118,22 @@ router.post('/login', (req, res) => {
         // .checkPassword() will then return true on success or false on failure; we'll store this boolean value to the validPassword variable
         // note that the instance method was called on the user retrieved from the database, dbUserData (because it returns a boolean, we can use it in a conditional statement to verify whether the user has been verified or not)
         const validPassword = dbUserData.checkPassword(req.body.password);
+
         if (!validPassword) {
             // if match returns false value, an error message is sent back to the client; the return exits out of the function immediately
             res.status(400).json({ message: 'Incorrect password!' });
             return;
         }
-        // if there is a match, the conditional statement block is ignored, and a response with the data and message below are sent instead
-        res.json({ user: dbUserData, message: 'You are now logged in!' });
+
+        req.session.save(() => {
+            // declare session variables
+            req.session.user_id = dbUserData.id;
+            req.session.username = dbUserData.username;
+            req.session.loggedIn = true;
+
+            // if there is a match, the conditional statement block is ignored, and a response with the data and message below are sent instead
+            res.json({ user: dbUserData, message: 'You are now logged in!' });
+        });
     });
 });
 
@@ -158,17 +174,17 @@ router.delete('/:id', (req, res) => {
             id: req.params.id
         }
     })
-    .then(dbUserData => {
-        if (!dbUserData) {
-            res.status(404).json({ message: 'No user found with this id' });
-            return;
-        }
-        res.json(dbUserData)
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
-    });
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No user found with this id' });
+                return;
+            }
+            res.json(dbUserData)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        });
 });
 
 module.exports = router;
