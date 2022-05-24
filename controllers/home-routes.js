@@ -3,6 +3,7 @@ const router = require('express').Router();
 const sequelize = require('../config/connection');
 const { Post, User, Comment } = require('../models');
 
+// root route
 router.get('/', (req, res) => {
     Post.findAll({
         attributes: [
@@ -43,6 +44,10 @@ router.get('/', (req, res) => {
         });
 });
 
-
+// renders login
+router.get('/login', (req, res) => {
+    // what's different here is that our login page doesn't need any variables so no need to pass a second argument to the render() method
+    res.render('login');
+  });
 
 module.exports = router;
