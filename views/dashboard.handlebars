@@ -13,3 +13,21 @@
     <button type="submit" class="btn">Create</button>
   </form>
 </section>
+
+{{!-- we wrapped the entire <section> element in an {{#if}} helper so users won't see any of this content if they have no posts --}}
+{{#if posts.length}}
+<section>
+  <h2>Your Posts</h2>
+  <ol>
+    {{#each posts as |post|}}
+    <li>
+      {{!-- we're also using the post-info partial to display the details for each post and we're adding a link below it that will route users to a separate edit page (e.g., /dashboard/edit/1) --}}
+      {{> post-info post}}
+      <a href="/dashboard/edit/{{post.id}}" class="edit-link">Edit post</a>
+    </li>
+    {{/each}}
+  </ol>
+</section>
+{{/if}}
+
+<script src="/javascript/add-post.js"></script>
