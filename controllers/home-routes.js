@@ -1,4 +1,5 @@
 // this file will contain all of the user-facing routes, such as the homepage and login page
+// intended for all homepage-related views
 const router = require('express').Router();
 const sequelize = require('../config/connection');
 const { Post, User, Comment } = require('../models');

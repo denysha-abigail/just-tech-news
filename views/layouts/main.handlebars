@@ -20,6 +20,8 @@ folder (views/welcome.handlebars) --}}
       </h1>
       <nav>
         {{#if loggedIn}}
+        {{!-- includes a dashboard link --}}
+        <a href="/dashboard">dashboard</a>
         {{!-- since logout won’t be an actual page that users can visit, it should be a button, but we can still style it to look like a link. --}}
         <button id="logout" class="btn-no-style">logout</button>
         {{!-- handlebars.js also supports the use of {{else}} --}}
