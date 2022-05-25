@@ -1,6 +1,6 @@
-{{!-- Your file/folder structure MUST be set up this way for Handlebars.js to work correctly. You will always have a
-main layout located at (and named) views/layouts/main.handlebars. All other template files will go directly in the views
-folder (views/welcome.handlebars). --}}
+{{!-- your file/folder structure MUST be set up this way for Handlebars.js to work correctly; you will always have a
+main layout located at (and named) views/layouts/main.handlebars; all other template files will go directly in the views
+folder (views/welcome.handlebars) --}}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,9 +19,13 @@ folder (views/welcome.handlebars). --}}
         <a href="/">Just Tech News</a>
       </h1>
       <nav>
-        {{!-- Since logout won’t be an actual page that users can visit, it should be a button, but we can still style it to look like a link. --}}
+        {{#if loggedIn}}
+        {{!-- since logout won’t be an actual page that users can visit, it should be a button, but we can still style it to look like a link. --}}
         <button id="logout" class="btn-no-style">logout</button>
+        {{!-- handlebars.js also supports the use of {{else}} --}}
+        {{else}}
         <a href="/login">login</a>
+        {{/if}}
       </nav>
     </header>
     <main>
@@ -34,7 +38,12 @@ folder (views/welcome.handlebars). --}}
     </footer>
   </div>
 
-  <script src="/javascript/logout.js"></script>
+{{!-- in order to not receive an error after removing the logout button from the page, wrap the <script> element with an {{#if}} helper --}}
+{{#if loggedIn}}
+<script src="/javascript/logout.js"></script>
+{{/if}}
 </body>
 
 </html>
+
+{{!-- variables that are passed to view templates are automatically passed to the main layout --}}

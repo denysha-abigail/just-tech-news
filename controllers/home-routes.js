@@ -37,7 +37,7 @@ router.get('/', (req, res) => {
       // in this case, we want to use the homepage.handlebars template (the .handlebars extension is implied)
       // res.render() can accept a second argument, an object (which includes all of the data we want to pass to our template)
       // dbPostData[0] is data that sequelize is returning as a sequelize object; to serialize the object down to only the properties that you need, you can use sequelize's get() method
-      res.render('homepage', { posts });
+      res.render('homepage', { posts, loggedIn: req.session.loggedIn });
     })
     .catch(err => {
       console.log(err);
