@@ -28,6 +28,8 @@ const sess = {
     })
   };
 
+// middleware is just a function that executes before the function that sends the response back; you can execute multiple middleware functions, too
+
 app.use(session(sess));
 
 const hbs = exphbs.create({ helpers });

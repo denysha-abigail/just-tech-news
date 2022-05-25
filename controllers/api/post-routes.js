@@ -2,6 +2,7 @@ const router = require('express').Router();
 // we include the User model for the post-routes because we want to retrieve not only information about each post, but also the user that posted it; with the foreign key user_id, we can form a JOIN
 const { Post, User, Vote, Comment } = require('../../models');
 const sequelize = require('../../config/connection');
+const withAuth = require('../utils/auth');
 
 // get all posts
 router.get('/', (req, res) => {
@@ -84,7 +85,7 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
     // we are using req.body to populate the columns in the post table
     // INSERT INTO post (title, post_url, user_id, created_at, updated_at) VALUES ("Taskmaster goes public!", "https://taskmaster/press", 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     // similar to the SQL query --> INSERT INTO
@@ -103,7 +104,7 @@ router.post('/', (req, res) => {
 
 // PUT /api/posts/upvote
 // goes before the /:id PUT route; otherwise Express.js will think the word 'upvote' is a valid parameter for /:id
-router.put('/upvote', (req, res) => {
+router.put('/upvote', withAuth, (req, res) => {
     // make sure the session exists first before even touching the database
     if (req.session) {
         // if a session does exist, we're using the saved user_id property on the session to insert a new record in the vote table
@@ -119,7 +120,7 @@ router.put('/upvote', (req, res) => {
 });
 
 // when testing in insomnia, the response may be just a 1 but it is SQL's way of verifying that the number of rows changed in the last query
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
     Post.update(
         // use request parameter to find the post, then used the req.body.title value to replace the title of the post
         {
@@ -145,7 +146,7 @@ router.put('/:id', (req, res) => {
         });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
     Post.destroy({
         where: {
             id: req.params.id

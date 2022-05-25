@@ -2,9 +2,12 @@
 const router = require('express').Router();
 const sequelize = require('../config/connection');
 const { Post, User, Comment } = require('../models');
+const withAuth = require('../utils/auth');
 
 // because the dashboard should only display posts created by the logged in user, you can add a where object to the findAll() query that uses the id saved on the session; you'll also need to serialize the Sequelize data before sending it to the template
-router.get('/', (req, res) => {
+// when withAuth() calls next(), it will call the next (anonymous) function. However, if withAuth() calls res.redirect(), there is no need for the next function to be called, because the response has already been sent
+// if you try to visit http://localhost:3001/dashboard without logging in first, you should be redirected to /login again
+router.get('/', withAuth, (req, res) => {
   Post.findAll({
     where: {
       // use the ID from the session
