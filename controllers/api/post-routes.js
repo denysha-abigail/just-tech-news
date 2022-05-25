@@ -2,7 +2,7 @@ const router = require('express').Router();
 // we include the User model for the post-routes because we want to retrieve not only information about each post, but also the user that posted it; with the foreign key user_id, we can form a JOIN
 const { Post, User, Vote, Comment } = require('../../models');
 const sequelize = require('../../config/connection');
-const withAuth = require('../utils/auth');
+const withAuth = require('../../utils/auth');
 
 // get all posts
 router.get('/', (req, res) => {
