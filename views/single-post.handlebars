@@ -14,18 +14,7 @@
 </form>
 {{/if}}
 
-<div class="comments">
-  {{#each post.comments}}
-  <section class="comment">
-    <div class="meta">
-      {{user.username}} on {{created_at}}
-    </div>
-    <div class="text">
-      {{comment_text}}
-    </div>
-  </section>
-  {{/each}}
-</div>
+{{> comments post.comments}}
 
 {{!-- the front end never receives a <form class="comment-form"> element or a <button class="upvote-btn"> element when the user is not logged on, but it still loaded the JavaScript files that look for those; because comment.js and upvote.js are only useful to users who can see those elements (i.e., logged-in users), we should just not load those resources --}}
 {{#if loggedIn}}
