@@ -1,14 +1,46 @@
 const express = require('express');
 // the router instance in routes/index.js collected everything and packaged them up for server.js to use
-const routes = require('./routes');
+const routes = require('./controllers');
 // importing connection to sequelize
 const sequelize = require('./config/connection');
+// allows stylesheet to be made available to the client
+const path = require('path');
+// sets up handlebars.js as app's template engine of choice
+const exphbs = require('express-handlebars');
+// implement the helper by telling handlebars.js about the helpers file
+const helpers = require('./utils/helpers');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// sets up an Express.js session and connects the session to our Sequelize database
+const session = require('express-session');
+
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+
+const sess = {
+    secret: 'Super secret secret',
+    cookie: {},
+    resave: false,
+    saveUninitialized: true,
+    store: new SequelizeStore({
+      db: sequelize
+    })
+  };
+
+// middleware is just a function that executes before the function that sends the response back; you can execute multiple middleware functions, too
+
+app.use(session(sess));
+
+const hbs = exphbs.create({ helpers });
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// express.static() is a built-in Express.js middleware function that can take all of the contents of a folder and serve them as static assets 
+app.use(express.static(path.join(__dirname, 'public')));
 
 // turn on routes
 app.use(routes);

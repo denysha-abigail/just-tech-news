@@ -1,0 +1,51 @@
+{{!-- your file/folder structure MUST be set up this way for Handlebars.js to work correctly; you will always have a
+main layout located at (and named) views/layouts/main.handlebars; all other template files will go directly in the views
+folder (views/welcome.handlebars) --}}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Just Tech News</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>
+        <a href="/">Just Tech News</a>
+      </h1>
+      <nav>
+        {{#if loggedIn}}
+        {{!-- includes a dashboard link --}}
+        <a href="/dashboard">dashboard</a>
+        {{!-- since logout won’t be an actual page that users can visit, it should be a button, but we can still style it to look like a link. --}}
+        <button id="logout" class="btn-no-style">logout</button>
+        {{!-- handlebars.js also supports the use of {{else}} --}}
+        {{else}}
+        <a href="/login">login</a>
+        {{/if}}
+      </nav>
+    </header>
+    <main>
+      {{!-- handlebars.js syntax for data that will be plugged in later; in this case, the data will be another, smaller
+      template, like the contents of the homepage --}}
+      {{{ body }}}
+    </main>
+    <footer>
+      Thanks for visiting!
+    </footer>
+  </div>
+
+{{!-- in order to not receive an error after removing the logout button from the page, wrap the <script> element with an {{#if}} helper --}}
+{{#if loggedIn}}
+<script src="/javascript/logout.js"></script>
+{{/if}}
+</body>
+
+</html>
+
+{{!-- variables that are passed to view templates are automatically passed to the main layout --}}

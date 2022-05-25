@@ -1,6 +1,7 @@
 // objects generated from classes are instances of the class
 const router = require('express').Router();
 const { User, Post, Vote } = require('../../models');
+const withAuth = require('../../utils/auth');
 
 // naming conventions (i.e /api/users, /api/posts, /api/comments), along with the use of HTTP methods follow a famous API architectural pattern called REST, or Representational State Transfer; APIs built following this pattern are what's known as RESTful APIs
 // some guidelines => name endpoints in a way that describes the data you're interfacing with, usee HTTP methods like get, post, put, and delete to describe the action you're performing to interface with that endpoint (GET /api/users - you should expect to receive user data), and use the propert HTTP status codes like 400, 404, and 500 to indicate errors in a request
@@ -70,7 +71,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/users
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
     // expects {username: 'Lernantino', email: 'lernantino@gmail.com', password: 'password1234'}
     // to insert data we can use sequelize's .create() method; pass in key/value pairs where the keys are what we defined in the User model and the values are what we get from req.body
     // similar to SQL query --> INSERT INTO users (username, email, password) VALUES ("Lernantino", "lernantino@gmail.com", "password1234");
@@ -79,17 +80,24 @@ router.post('/', (req, res) => {
         email: req.body.email,
         password: req.body.password
     })
-        .then(dbUserData => res.json(dbUserData))
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        });
+        // this gives our server easy access to the user's user_id, username, and a Boolean describing whether or not the user is logged in
+        .then(dbUserData => {
+            // we want to make sure the session is created before we send the response back so we're wrapping the variables in a callback
+            // the req.session.save() method will initiate the creation of the session and then run the callback function once complete
+            req.session.save(() => {
+                req.session.user_id = dbUserData.id;
+                req.session.username = dbUserData.username;
+                req.session.loggedIn = true;
+
+                res.json(dbUserData);
+            });
+        })
 });
 
 // this route will be found at http://localhost:3001/api/users/login
 // POST is the standard for the loging that's in process
 // GET carries the request parameter appended in the URL string; POST, on the other hand, carries the request parameter in req.body (which makes it a more secure way of transferring data from the client to the server)
-router.post('/login', (req, res) => {
+router.post('/login', withAuth, (req, res) => {
     // expectd {email: 'lernantino@gmail.com', password: 'password1234'}
     // query the User table using the findOne() method for the email entered by the user and assigned it to req.body.email
     // .findOne() sequelize method looks for a user with the specified email
@@ -97,11 +105,11 @@ router.post('/login', (req, res) => {
         where: {
             email: req.body.email
         }
-    // the result of the query is passed as dbUserData to the .then() part of the .findOne() method; 
+        // the result of the query is passed as dbUserData to the .then() part of the .findOne() method; 
     }).then(dbUserData => {
-        if(!dbUserData) {
+        if (!dbUserData) {
             // if user with that email not found, a message is sent back as a response to the client
-            res.status(400).json({ message: 'No user with that email address! '});
+            res.status(400).json({ message: 'No user with that email address! ' });
             return;
         }
         // if email was found in the database, the next step would be to verify the user's identity by matching the password from the user and the hashed password in the database
@@ -111,19 +119,41 @@ router.post('/login', (req, res) => {
         // .checkPassword() will then return true on success or false on failure; we'll store this boolean value to the validPassword variable
         // note that the instance method was called on the user retrieved from the database, dbUserData (because it returns a boolean, we can use it in a conditional statement to verify whether the user has been verified or not)
         const validPassword = dbUserData.checkPassword(req.body.password);
+
         if (!validPassword) {
             // if match returns false value, an error message is sent back to the client; the return exits out of the function immediately
             res.status(400).json({ message: 'Incorrect password!' });
             return;
         }
-        // if there is a match, the conditional statement block is ignored, and a response with the data and message below are sent instead
-        res.json({ user: dbUserData, message: 'You are now logged in!' });
+
+        req.session.save(() => {
+            // declare session variables
+            req.session.user_id = dbUserData.id;
+            req.session.username = dbUserData.username;
+            req.session.loggedIn = true;
+
+            // if there is a match, the conditional statement block is ignored, and a response with the data and message below are sent instead
+            res.json({ user: dbUserData, message: 'You are now logged in!' });
+        });
     });
+});
+
+// gives user ability to log out; this entails destroying the session variables and resetting the cookie
+router.post('/logout', withAuth, (req, res) => {
+    if (req.session.loggedIn) {
+        // we can use the destroy() method to clear the session
+        req.session.destroy(() => {
+            // status code 204 is sent back to the user after the session has successfully been destroyed
+            res.status(204).end();
+        });
+    } else {
+        res.status(404).end();
+    }
 });
 
 // PUT /api/users/1
 // to update existing data
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
     // expects {username: 'Lernantino', email: 'lernantino@gmail.com', password: 'password1234'}
 
     // if req.body has exact key/value pairs to match the model, you can just use `req.body` instead
@@ -151,24 +181,24 @@ router.put('/:id', (req, res) => {
 
 // DELETE /api/users/1
 // to delete user from database
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
     // to delete data use the .destroy() method and provide some type of identifier to indicate where exactly we would like to delete data from the user database table
     User.destroy({
         where: {
             id: req.params.id
         }
     })
-    .then(dbUserData => {
-        if (!dbUserData) {
-            res.status(404).json({ message: 'No user found with this id' });
-            return;
-        }
-        res.json(dbUserData)
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json(err);
-    });
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No user found with this id' });
+                return;
+            }
+            res.json(dbUserData)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        });
 });
 
 module.exports = router;

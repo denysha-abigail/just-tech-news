@@ -1,0 +1,25 @@
+{{> post-info post}}
+
+{{!-- the {{#if}} helper checks truthy values only; it resembles the {{#each}} helper and behaves like a JavaScript if statement --}}
+{{#if loggedIn}}
+<form class="comment-form">
+  <div>
+    <textarea name="comment-body"></textarea>
+  </div>
+
+  <div>
+    <button type="submit">add comment</button>
+    <button type="button" class="upvote-btn">upvote</button>
+  </div>
+</form>
+{{/if}}
+
+{{> comments post.comments}}
+
+{{!-- the front end never receives a <form class="comment-form"> element or a <button class="upvote-btn"> element when the user is not logged on, but it still loaded the JavaScript files that look for those; because comment.js and upvote.js are only useful to users who can see those elements (i.e., logged-in users), we should just not load those resources --}}
+{{#if loggedIn}}
+<script src="/javascript/comment.js"></script>
+<script src="/javascript/upvote.js"></script>
+{{/if}}
+
+{{!-- If the only code you changed was in a .handlebars file, you don't have to restart the server. The server will always respond with the latest version of the template when the client makes a request. --}}

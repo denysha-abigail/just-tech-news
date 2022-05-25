@@ -1,0 +1,16 @@
+{{!-- the {{ }} expressions can be used for content as well as attributes --}}
+
+{{!-- two brackets {{ title }} will convert HTML characters to strings; three brackets {{{ body }}} will render the data as HTML --}}
+
+{{!-- handlebars.js has built-in helpers that will allow us to perform minimal logic over an array --}}
+
+<ol class="post-list">
+    {{!-- note the use of {{#each}} to begin the loop; any HTML code in between will be repeated for every item in posts; within the {{#each}} block, handlebars.js is smart enough to know that it's working with an object on each iteration so it looks for the necessary properties; we declared a variable name in the {{#each}} expression to make it a little clearer as we use that name for subsequent placeholders --}}
+  {{#each posts as |post|}}
+  <li>
+    {{!-- to use a partial, all we need is the > character, followed by the name of the partial file and the object we'll pass to the partial --}}
+    {{> post-info post }}
+  </li>
+  {{!-- and {{/each}} to define where it ends --}}
+  {{/each}}
+</ol>
